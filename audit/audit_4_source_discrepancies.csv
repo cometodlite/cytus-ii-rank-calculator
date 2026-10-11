@@ -1,0 +1,2 @@
+﻿chart_key,field,audit_snapshot_value,independently_checked_page_value,audit_snapshot_source,independently_checked_source,checked_on,source_quality,disposition
+Re:Boost#CHAOS,actual_level,11+,11,https://cytus.fandom.com/wiki/Re:Boost,https://seore.org/w/Re:Boost,2026-10-12,Both are community-maintained; neither is official game data.,UNRESOLVED: retain source-specific raw values and recheck against in-game current version before relying on level. Do not normalize away the + marker.

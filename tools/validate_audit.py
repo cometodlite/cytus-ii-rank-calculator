@@ -194,6 +194,14 @@ def main():
         if standard & mstt:
             errors.append(f"DCT Standard and MSTT share candidate {label} keys: {sorted(standard & mstt)}")
 
+    grade_label = {**{str(n): f"{n}단" for n in range(1, 12)},
+                   "12": "자격 1", "13": "자격 2", "14": "자격 3", "15": "MASTER"}
+    for filename, rows in (("dct_candidate_rosters.csv", dct_rows), ("chart_slots.csv", slots)):
+        for row in rows:
+            if row.get("exam_type") in {"DCT Standard", "DCT MSTT"} and \
+                    row.get("grade_label") != grade_label.get(row.get("grade_no", "")):
+                errors.append(f"{filename}: {row.get('slot_id')} grade_no/grade_label mismatch")
+
     replacements, _ = read_csv(REPLACEMENT_FILE)
     if any(r.get("candidate_status") != "SOURCE_CONFIRMED" for r in replacements):
         errors.append("Replacement candidates must retain source-fact status")
@@ -241,8 +249,40 @@ def main():
         errors.append(f"Expected 120 DCT candidate review rows, found {len(dct_review)}")
     if len(playtests) != 237:
         errors.append(f"Expected 237 unique playtest queue charts, found {len(playtests)}")
+    if playtests and ("priority_rank" not in playtests[0] or "priority_class" not in playtests[0]):
+        errors.append("Playtest queue must include 4th-audit priority fields")
+    elif sorted(int(r["priority_rank"]) for r in playtests) != list(range(1, 238)):
+        errors.append("Playtest queue priority ranks must be unique and contiguous 1..237")
+    desk_review, _ = read_csv(AUDIT / "chart_desk_review.csv")
+    if len(desk_review) != 237:
+        errors.append(f"Expected 237 desk-review rows, found {len(desk_review)}")
+    if any(r.get("desk_review_status") not in {"DESK_REVIEWED", "PENDING"} or r.get("playtest_status") != "PENDING"
+           for r in desk_review):
+        errors.append("Desk review must be evidence-backed; playtest must remain PENDING")
+    desk_by_key = {r.get("candidate_chart_key"): r for r in desk_review}
+    if any(r.get("desk_review_status") != desk_by_key.get(r.get("candidate_chart_key"), {}).get("desk_review_status")
+           for r in playtests):
+        errors.append("Playtest queue desk-review states must match the chart analysis report")
+    if any(r.get("desk_review_status") == "DESK_REVIEWED" and
+           (not r.get("source_commit") or not r.get("snapshot_note_count") or not r.get("snapshot_top_rhythm_patterns"))
+           for r in desk_review):
+        errors.append("DESK_REVIEWED rows need traceable chart structure fields and source revision")
+    if any(r.get("provisional_retain_type_by_level_fit") != "UNRESOLVED" for r in overlap_review):
+        errors.append("SV/STT overlap ownership must remain UNRESOLVED")
     if len(progression) != 72:
         errors.append(f"Expected 72 grade progression rows, found {len(progression)}")
+    lower, _ = read_csv(AUDIT / "standard_4_7_lower_level_rationale.csv")
+    conflicts, _ = read_csv(AUDIT / "standard_4_7_duplicate_conflicts.csv")
+    grade_ids, _ = read_csv(AUDIT / "dct_grade_identifier_consistency.csv")
+    blockers, _ = read_csv(AUDIT / "audit_4_approval_blockers.csv")
+    if len(lower) != 13 or any(r.get("review_status") != "PENDING" for r in lower):
+        errors.append("Standard 4-7 lower-level rationale must document 13 pending rows")
+    if len(conflicts) != 2 or any(not r.get("replacement_decision", "").startswith("UNRESOLVED") for r in conflicts):
+        errors.append("Re:Boost and Green Hope duplicate candidates must remain unresolved")
+    if len(grade_ids) != 30 or any(r.get("status") != "PASS" or int(r.get("slot_count", 0)) != 4 for r in grade_ids):
+        errors.append("DCT grade identifier report must cover 30 normalized grades with four slots each")
+    if len(blockers) != 7:
+        errors.append("4th-audit approval blocker list must contain seven areas")
     for name, data in (("overlap resolutions", overlap_review), ("replacement options", alternatives),
                        ("DCT review", dct_review), ("playtest queue", playtests)):
         if any(r.get("source_status") != "SOURCE_CONFIRMED" or
@@ -261,9 +301,11 @@ def main():
     print(f"B-DCT chart facts: {len(facts)}; DCT proposals: {len(dct_rows)}; potential overlaps: {len(overlaps)}")
     print(f"Replacement candidates: {len(replacements)}; heuristic conflicts: "
           f"{sum(r.get('candidate_key_used_by_current_app_mapping') == 'YES' for r in replacements)}")
-    print(f"3rd-audit: Standard 4-7={len(standard_review)}; overlap resolutions={len(overlap_review)}; "
+    print(f"4th-audit: Standard 4-7={len(standard_review)}; overlap resolutions={len(overlap_review)}; "
           f"alternatives={len(alternatives)}; DCT review={len(dct_review)}; "
-          f"grade progression={len(progression)}; playtest queue={len(playtests)}")
+          f"grade progression={len(progression)}; playtest queue={len(playtests)}; "
+          f"desk-reviewed={sum(r.get('desk_review_status') == 'DESK_REVIEWED' for r in desk_review)}; "
+          f"pending desk review={sum(r.get('desk_review_status') == 'PENDING' for r in desk_review)}")
     if errors:
         print("Validation: FAIL", file=sys.stderr)
         for error in errors:

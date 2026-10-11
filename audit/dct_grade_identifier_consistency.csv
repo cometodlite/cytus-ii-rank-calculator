@@ -1,0 +1,31 @@
+﻿exam_type,internal_grade_no,display_grade_label,slot_count,candidate_labels_match_normalization,normalization_rule,status
+DCT Standard,1,1단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,2,2단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,3,3단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,4,4단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,5,5단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,6,6단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,7,7단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,8,8단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,9,9단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,10,10단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,11,11단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,12,자격 1,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,13,자격 2,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,14,자격 3,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT Standard,15,MASTER,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,1,1단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,2,2단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,3,3단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,4,4단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,5,5단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,6,6단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,7,7단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,8,8단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,9,9단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,10,10단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,11,11단,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,12,자격 1,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,13,자격 2,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,14,자격 3,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS
+DCT MSTT,15,MASTER,4,YES,Internal ordinal 1-11 => displayed N단; 12-14 => 자격 1-3; 15 => MASTER. grade_no remains numeric machine key and is not shown as a public grade name.,PASS

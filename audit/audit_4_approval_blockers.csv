@@ -1,0 +1,8 @@
+﻿area,finding,required_to_resolve,status
+B-DCT Standard 4-7,13 candidates are one nominal level below the approved targets,Review play results and chart structure; exact target chart absent in audited same-song fact set,PENDING
+B-DCT Standard duplicates,Re:Boost HARD overlaps SV and STT; Green Hope HARD overlaps SV under app heuristic,"Approve which type may retain each exact chart, or approve a sourced replacement; current alternatives are not equivalent by level alone",UNRESOLVED
+B-DCT SV/STT overlaps,"37 potential chart keys, conditional on HARD/CHAOS app rule",Inspect purpose-specific evidence and confirm whether source assignment is real,UNRESOLVED
+Standard grades 1-3,Current app-assumed source levels are non-monotonic and grade 4 proposal reconnects near grade 1 levels,Recover/confirm actual historic chart assignments and intended target bands before judging continuity,UNRESOLVED
+DCT Standard/MSTT,120 independent candidates have catalog metadata; structural diversity not inspected,Chart visual/event data and playtest records required; preserve independent lists,PENDING
+MSTT,Formula and pass threshold remain undefined,Separate explicit approval required before any pass/fail calculation,DEFERRED
+All 288 slots,No candidate-to-slot assignment evidence is confirmed,Keep every slot PENDING until user approves final allocation and supporting evidence is recorded,PENDING
