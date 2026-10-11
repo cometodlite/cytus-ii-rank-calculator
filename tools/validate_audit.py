@@ -32,6 +32,7 @@ SLOT_REQUIRED = {
     "current_chart_difficulty_assumption", "chart_difficulty", "chart_variant",
     "game_version", "actual_level", "unlock_condition", "source_url",
     "verified_on", "verification_status", "slot_assignment_evidence",
+    "candidate_review_status", "playtest_status", "slot_verification_status",
 }
 VERIFIED_FIELDS = (
     "song_id", "song_title", "chart_difficulty", "chart_variant", "game_version",
@@ -64,6 +65,13 @@ def valid_date(value):
         return True
     except ValueError:
         return False
+
+
+def level_num(value):
+    value = (value or "").strip()
+    if not value or not value[0].isdigit():
+        return None
+    return int(value.rstrip("+")) + (0.5 if value.endswith("+") else 0)
 
 
 def main():
@@ -111,11 +119,14 @@ def main():
                         ("song_id", "chart_difficulty", "chart_variant", "game_version"))
             verified_chart_keys[key].append(row)
         # A fact check cannot silently promote an assignment to verified.
-        if row.get("candidate_chart_fact_status", "").upper() == "CHART_CONFIRMED" and status == "VERIFIED":
+        if row.get("candidate_chart_fact_status", "").upper() == "SOURCE_CONFIRMED" and status == "VERIFIED":
             if not row.get("slot_assignment_evidence", "").strip():
                 errors.append(f"{row['slot_id']}: chart fact alone cannot verify a slot assignment")
-        if row.get("exam_type", "").startswith("B-DCT") and row.get("candidate_chart_fact_status") != "CHART_CONFIRMED":
+        if row.get("exam_type", "").startswith("B-DCT") and row.get("candidate_chart_fact_status") != "SOURCE_CONFIRMED":
             errors.append(f"{row['slot_id']}: B-DCT candidate chart fact is missing")
+        if row.get("candidate_review_status") != "PENDING" or row.get("playtest_status") != "PENDING" or \
+                row.get("slot_verification_status") != "PENDING":
+            errors.append(f"{row['slot_id']}: review, playtest, and slot verification must remain PENDING")
 
     for key, owners in verified_chart_keys.items():
         if len({r["exam_type"] for r in owners}) > 1:
@@ -148,8 +159,11 @@ def main():
             errors.append(f"{exam}: expected 15 grades with four candidates each")
         if any(r.get("slot_assignment_status") != "PENDING" for r in rows):
             errors.append(f"{exam}: proposal slot assignments must remain PENDING")
-        if any(r.get("candidate_status") != "CHART_CONFIRMED" for r in rows):
+        if any(r.get("candidate_status") != "SOURCE_CONFIRMED" for r in rows):
             errors.append(f"{exam}: unexpected candidate_status")
+        if any(r.get("candidate_review_status") != "PENDING" or r.get("playtest_status") != "PENDING"
+               or r.get("slot_verification_status") != "PENDING" for r in rows):
+            errors.append(f"{exam}: candidates must remain unreviewed, unplayed, and unassigned")
         if len({r.get("slot_id") for r in rows}) != len(rows):
             errors.append(f"{exam}: duplicate slot_id")
         for row in rows:
@@ -181,7 +195,7 @@ def main():
             errors.append(f"DCT Standard and MSTT share candidate {label} keys: {sorted(standard & mstt)}")
 
     replacements, _ = read_csv(REPLACEMENT_FILE)
-    if any(r.get("candidate_status") != "CHART_CONFIRMED" for r in replacements):
+    if any(r.get("candidate_status") != "SOURCE_CONFIRMED" for r in replacements):
         errors.append("Replacement candidates must retain source-fact status")
     if any(r.get("candidate_key_used_by_current_app_mapping") not in {"YES", "NO"} for r in replacements):
         errors.append("Replacement candidates must expose current heuristic conflict flag")
@@ -193,10 +207,53 @@ def main():
     facts, _ = read_csv(FACT_FILE)
     if len(facts) != 125:
         errors.append(f"Expected 125 B-DCT chart facts, found {len(facts)}")
-    if any(r.get("fact_status") != "CHART_CONFIRMED" for r in facts):
+    if any(r.get("fact_status") != "SOURCE_CONFIRMED" for r in facts):
         errors.append("Unexpected B-DCT chart fact status")
     if any(not valid_date(r.get("source_checked_on")) for r in facts):
         errors.append("B-DCT chart facts need a valid source_checked_on date")
+
+    standard_review, _ = read_csv(AUDIT / "bdct_standard_4_7_recomposition_candidates.csv")
+    if len(standard_review) != 16:
+        errors.append(f"Expected 16 Standard 4-7 candidate rows, found {len(standard_review)}")
+    if any(r.get("source_status") != "SOURCE_CONFIRMED" or
+           r.get("candidate_review_status") != "PENDING" or r.get("playtest_status") != "PENDING" or
+           r.get("slot_verification_status") != "PENDING" for r in standard_review):
+        errors.append("Standard 4-7 candidates must remain source-confirmed and pending further review")
+    for grade in range(4, 8):
+        group = sorted((r for r in standard_review if int(r["grade_no"]) == grade),
+                       key=lambda r: int(r["proposed_position"]))
+        if len(group) != 4 or [int(r["proposed_position"]) for r in group] != [1, 2, 3, 4]:
+            errors.append(f"Standard grade {grade}: proposed order must contain four positions")
+        values = [level_num(r["proposed_level"]) for r in group]
+        if any(v is None for v in values) or values != sorted(values):
+            errors.append(f"Standard grade {grade}: proposed chart levels must be nondecreasing")
+
+    overlap_review, _ = read_csv(AUDIT / "bdct_sv_stt_overlap_resolution.csv")
+    alternatives, _ = read_csv(AUDIT / "bdct_cross_type_replacement_options.csv")
+    dct_review, _ = read_csv(AUDIT / "dct_candidate_review.csv")
+    playtests, _ = read_csv(AUDIT / "chart_playtest_queue.csv")
+    progression, _ = read_csv(AUDIT / "grade_level_progression.csv")
+    if len(overlap_review) != 37:
+        errors.append(f"Expected 37 overlap resolution rows, found {len(overlap_review)}")
+    if len(alternatives) != 291:
+        errors.append(f"Expected 291 cross-type replacement options, found {len(alternatives)}")
+    if len(dct_review) != 120:
+        errors.append(f"Expected 120 DCT candidate review rows, found {len(dct_review)}")
+    if len(playtests) != 237:
+        errors.append(f"Expected 237 unique playtest queue charts, found {len(playtests)}")
+    if len(progression) != 72:
+        errors.append(f"Expected 72 grade progression rows, found {len(progression)}")
+    for name, data in (("overlap resolutions", overlap_review), ("replacement options", alternatives),
+                       ("DCT review", dct_review), ("playtest queue", playtests)):
+        if any(r.get("source_status") != "SOURCE_CONFIRMED" or
+               r.get("candidate_review_status") != "PENDING" or r.get("playtest_status") != "PENDING"
+               or r.get("slot_verification_status") != "PENDING" for r in data):
+            errors.append(f"{name}: source facts cannot be promoted to reviewed, playtested, or verified")
+    if any(r.get("target_fit") != "EXACT" for r in dct_review):
+        errors.append("DCT candidate review rows must retain exact source-level/target match flag")
+    if any(r.get("candidate_review_status") != "PENDING" or r.get("playtest_status") != "PENDING"
+           or r.get("slot_verification_status") != "PENDING" for r in progression):
+        errors.append("Grade progression rows cannot promote candidates beyond PENDING review")
 
     print(f"Audit slots: {len(slots)} / 288; statuses: {dict(statuses)}")
     for exam, (grades, count) in EXPECTED.items():
@@ -204,6 +261,9 @@ def main():
     print(f"B-DCT chart facts: {len(facts)}; DCT proposals: {len(dct_rows)}; potential overlaps: {len(overlaps)}")
     print(f"Replacement candidates: {len(replacements)}; heuristic conflicts: "
           f"{sum(r.get('candidate_key_used_by_current_app_mapping') == 'YES' for r in replacements)}")
+    print(f"3rd-audit: Standard 4-7={len(standard_review)}; overlap resolutions={len(overlap_review)}; "
+          f"alternatives={len(alternatives)}; DCT review={len(dct_review)}; "
+          f"grade progression={len(progression)}; playtest queue={len(playtests)}")
     if errors:
         print("Validation: FAIL", file=sys.stderr)
         for error in errors:
